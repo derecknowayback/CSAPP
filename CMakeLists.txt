@@ -3,4 +3,4 @@ project(CSAPP C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(CSAPP main.c)
+add_executable(CSAPP source/main.c)
