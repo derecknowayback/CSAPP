@@ -3,6 +3,9 @@
 //
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 const int w = sizeof(int) << 3;
 const int all1 = ~0; //全为1的cover_code
 
@@ -139,17 +142,89 @@ int fits_bits(int x, int n){
 //2.71
 typedef unsigned packed_t;
 //原先的func没有考虑到machine 是 算术右移的
+//ban 掉了 & 怎么做呢
 int xbyte(packed_t word,int bytenum){
     int max = 0xffffffff;
     int offset = bytenum << 3;
 
 }
 
+//2.72
+void copy_int(int val,void* buf,int maxbytes){
+    //Wrong Code:if(maxbytes - sizeof(val) >= 0)
+    // ->  For operation sizeof return 'size_t' equals to unsigned
+    if(maxbytes >= sizeof(val))
+        memcpy(buf,(void*)&val, sizeof(val));
+}
 
 
 
+//2.73
+//饱和（溢出）的时候返回 Tmax or Tmin
+int saturating_add(int x, int y){
+    int sum = x + y;
+    //不使用if怎么办？
+
+}
+
+//2.74
+//if x-y not overflows, return 1
+int tsub_ok(int x, int y){
+    //不用 < 很难做到
+}
+
+//2.75
+//怎么不用循环实现 获得x*y的高w位
+int signed_high_prod(int x, int y){
+
+}
+unsigned unsigned_high_prod(unsigned x,unsigned y){
+
+}
 
 
+//2.76
+void *my_calloc(size_t nmeb, size_t size){
+    //Q:size_t is unsigned long on Linux, how should I solve the overflow problem?
+    void* res_ptr = malloc(size * nmeb);
+    memset(res_ptr,0,nmeb * size);
+}
+
+//2.78
+int divide_power2(int x, int y){
+    // 不用 ? 和 if 怎么做
+    //return (x > 0 ? x : (x + (y << 1) - 1)) / ( 2 << y );
+}
+
+//2.79
+//return x * 3 / 4
+int mul3div4(int x){
+    x = divide_power2(x,2);
+    return x * 3;
+}
+
+//2.80
+//return 3/4x
+int threefourths(int x){
+    //difference ???
+}
+
+//2.81
+//bit patterns: 1(w-k个1)--0(k个0)
+int bit_mode_k(int k){
+    return all1 << k;
+}
+//bit patterns： 0（w-k-j个0）--1（k个1）--0（j个0）
+int bit_mode_k_j(int k, int j){
+    //if(j == 0) return bit_mode_k_j(k);
+    int suffix0 = all1 << j;
+    int prefix0 = (1 << (k + j + 1)) - 1; // k + j == w 可以吗？？？
+    return suffix0 & prefix0;
+}
+
+
+
+//2.82
 
 
 
