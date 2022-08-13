@@ -79,11 +79,11 @@ unsigned srl(unsigned x,int k){
 }
 
 //2.64
-/*Judge if all odd bits of x are equal to 1;
- * If yes,return 1, Otherwise, return 0.
+/*Judge if any odd bits of x are equal to 1
+ * If yes,return 1, Otherwise, return 0. -> 只要奇数位有1，就返回1，否则返回0
  * (Assume w == 32 bits )*/
 int any_odd_one(unsigned x){
-    return !(x & 0xaaaaaaaa - 0xaaaaaaaa);
+    return x & 0xaaaaaaaa;
 }
 
 //2.65
