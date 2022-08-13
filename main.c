@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include "Chapter2.h"
 int main(){
-    int a = 0xf0000000;
-    a = a<<4;
-    printf("%d",a);
+    int x = 1 << 32;
+    int y = 32;
+    int z = 1 << y;
+    printf("x:%d, z: %d\n", x, z);
     return 0;
 }
 
