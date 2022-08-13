@@ -142,7 +142,6 @@ typedef unsigned packed_t;
 int xbyte(packed_t word,int bytenum){
     int max = 0xffffffff;
     int offset = bytenum << 3;
-
 }
 
 
