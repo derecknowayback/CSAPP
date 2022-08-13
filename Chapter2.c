@@ -224,6 +224,3 @@ int bit_mode_k_j(int k, int j){
 
 
 //2.82
-
-
-
