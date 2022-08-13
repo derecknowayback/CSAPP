@@ -76,3 +76,80 @@ int any_odd_one(unsigned x){
 int odd_ones(unsigned x){
 
 }
+
+//2.66
+/*
+ * 只保留最左边的1，其余为0；如果x == 0,return 0;
+ * assume w = 32;
+ */
+int leftmost_one(unsigned x){
+    //先变成 000011..111的形式
+    x = x & all1;
+    unsigned low = x >> 1;
+    return x - low;
+}
+
+//2.67
+/*
+ * int bad_int_size_is_32(){
+ *  int set_msb = 1 << 31;
+ *  int beyond_msb = 1 << 32;
+ *  return set_msb && !beyond_msb;
+ * }
+ * warning : left shift count >= width 32
+ * 没有遵守C语言右移不能大于width的标准,移动32位实际上只移动1位
+ */
+//running on 32
+int my_int_size_is_32(){
+    int beyond_msb = 1 << 32;
+    return !(beyond_msb-1); // beyond_msb == 1
+}
+
+//running on 16
+int my_int_size_is_16(){
+    int beyond_msb = 1 << 32;
+    return !(beyond_msb-1); // beyond_msb == 1
+}
+
+//2.68
+//用n个1组成最小的数
+int lower_one_mask(int n){
+    int shift = w - n; // what if w == n ??? `10000` is the smallest
+    return (unsigned)all1 >> shift;
+}
+
+//2.69
+//bit位左旋: 比如w=4, x=1011, 左旋1位--> newX = 0111
+unsigned rotate_left(unsigned  x, int n){
+    //取模
+    n = n & (w - 1);
+    int high = x >> (w - n);
+    x = x << n;
+    return x + high;
+}
+
+
+//2.70
+// fits_bits
+int fits_bits(int x, int n){
+    int cover = all1 << n; // 1111100000000
+    return !(x&cover);
+}
+
+//2.71
+typedef unsigned packed_t;
+//原先的func没有考虑到machine 是 算术右移的
+int xbyte(packed_t word,int bytenum){
+    int max = 0xffffffff;
+    int offset = bytenum << 3;
+
+}
+
+
+
+
+
+
+
+
+
