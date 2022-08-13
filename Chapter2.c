@@ -220,7 +220,3 @@ int bit_mode_k_j(int k, int j){
     int prefix0 = (1 << (k + j + 1)) - 1; // k + j == w 可以吗？？？
     return suffix0 & prefix0;
 }
-
-
-
-//2.82
