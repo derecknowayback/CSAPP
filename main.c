@@ -1,10 +1,10 @@
+#include <assert.h>
 #include <stdio.h>
 #include "Chapter2.h"
+#include <limits.h>
 int main(){
-    int x = 1 << 32;
-    int y = 32;
-    int z = 1 << y;
-    printf("x:%d, z: %d\n", x, z);
+    assert(tsub_ok(2,INT_MIN));
+    printf("okk");
     return 0;
 }
 

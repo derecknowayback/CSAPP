@@ -18,7 +18,7 @@ void show_bytes(char* pointer,size_t len){
     printf("\n");
 }
 
-//todo 2.58
+// 2.58
 //int is_little_endian(){
 //    char *byte1,*byte2;
 //    int a = 1;
@@ -28,7 +28,6 @@ void show_bytes(char* pointer,size_t len){
 //    byte2 = (char *)&a + sizeof(char); // byte2 = 00
 //    return *byte1 - *byte2;
 //}
-
 int is_little_endian(){
     char* byte ;
     unsigned magic = 0xff;
@@ -37,7 +36,7 @@ int is_little_endian(){
 }
 
 
-//todo 2.59
+// 2.59
 int low_x_high_y(int x,int y){
     x = x & 0xFF;
     y = (y >> 8) << 8;
@@ -46,26 +45,26 @@ int low_x_high_y(int x,int y){
 
 
 
-//todo 2.60
+// 2.60
 unsigned replace_byte(unsigned x,int i,unsigned char b){
-    int mask = all1 - (0xff << i * 8); // 得到一个除了replace位，其他位全为1的掩码(打掉要替换的段）
-    x = x & mask;
-    x = x + (b << (i*8));
-    return x;
+//    int mask = all1 - (0xff << i * 8); // 得到一个除了replace位，其他位全为1的掩码(打掉要替换的段）
+//    x = x & mask;
+//    x = x + (b << (i*8));
+//    return x;
     //1 byte has 8 bits, << 3 means * 8
-    //  unsigned mask = ((unsigned) 0xFF) << (i << 3);
-    //  unsigned pos_byte = ((unsigned) b) << (i << 3);
-    //  return (x & ~mask) | pos_byte;
+      unsigned mask = ((unsigned) 0xFF) << (i << 3);
+      unsigned pos_byte = ((unsigned) b) << (i << 3);
+      return (x & ~mask) | pos_byte;
 }
 
-//todo 2.61
+// 2.61
 int bit_test(int x){
     int lowest_byte = x & 0xff; //最低字节
     int highest_byte = (x >> (w-8)) & 0xff; // 最高字节
     return !(x^all1)||!(x|0)||!(lowest_byte^0xff)||!(highest_byte|0);
 }
 
-//todo 2.62
+// 2.62
 int int_shifts_are_arithmetic(){
 //    int a = all1 >> 8;
 //    char *byte1 = (char*)&all1, *byte2 = (char*)&a;
@@ -73,12 +72,19 @@ int int_shifts_are_arithmetic(){
     return !(all1 ^ (all1 >> 1));
 }
 
-//todo 2.63
+// 2.63
 unsigned srl(unsigned x,int k){
+    unsigned xsra = (int ) x >> k;
+    unsigned mask = ~(all1 << (w - k));
+    return xsra & mask;
+}
+int sra(int x, int k){
+    int xsrl = (unsigned ) x >> k;
+    unsigned sign = x & (1 << (w-1));
 
 }
 
-//2.64
+// 2.64
 /*Judge if any odd bits of x are equal to 1
  * If yes,return 1, Otherwise, return 0. -> 只要奇数位有1，就返回1，否则返回0
  * (Assume w == 32 bits )*/
@@ -91,7 +97,13 @@ int any_odd_one(unsigned x){
  * Return 1 when x contains an odd number of 1s ; 0 otherwise
  */
 int odd_ones(unsigned x){
-
+    x ^= x >> 16;
+    x ^= x >> 8;
+    x ^= x >> 4;
+    x ^= x >> 2;
+    x ^= x >> 1;
+    x &= 0x1;
+    return x;
 }
 
 //2.66
@@ -99,11 +111,22 @@ int odd_ones(unsigned x){
  * 只保留最左边的1，其余为0；如果x == 0,return 0;
  * assume w = 32;
  */
-int leftmost_one(unsigned x){
-    //先变成 000011..111的形式
-    x = x & all1;
-    unsigned low = x >> 1;
-    return x - low;
+int leftmost_one(unsigned x) {
+    /*
+     * first, generate a mask that all bits after leftmost one are one
+     * e.g. 0xFF00 -> 0xFFFF, and 0x6000 -> 0x7FFF
+     * If x = 0, get 0
+     */
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    /*
+     * then, do (mask >> 1) + (mask && 1), in which mask && 1 deals with case x = 0, reserve leftmost bit one
+     * that's we want
+     */
+    return (x >> 1) + (x && 1);
 }
 
 //2.67
@@ -117,16 +140,18 @@ int leftmost_one(unsigned x){
  * 没有遵守C语言右移不能大于width的标准,移动32位实际上只移动1位
  */
 //running on 32
-int my_int_size_is_32(){
-    int beyond_msb = 1 << 32;
-    return !(beyond_msb-1); // beyond_msb == 1
+int int_size_is_32() {
+    int set_msb = 1 << 31;
+    int beyond_msb = set_msb << 1;
+    return set_msb && !beyond_msb;
 }
 
-//running on 16
-int my_int_size_is_16(){
-    int beyond_msb = 1 << 32;
-    return !(beyond_msb-1); // beyond_msb == 1
+int int_size_is_32_for_16bit() {
+    int set_msb = 1 << 15 << 15 << 1;
+    int beyond_msb = set_msb << 1;
+    return set_msb && !beyond_msb;
 }
+
 
 //2.68
 //用n个1组成最小的数
@@ -143,47 +168,88 @@ unsigned rotate_left(unsigned  x, int n){
     int high = x >> (w - n);
     x = x << n;
     return x + high;
+//    int w = sizeof(unsigned) << 3;
+//    /* pay attention when n == 0 */
+//    return x << n | x >> (w - n );
 }
 
 
 //2.70
 // fits_bits
 int fits_bits(int x, int n){
-    int cover = all1 << n; // 1111100000000
-    return !(x&cover);
+    //自己写的有问题。碰到 比如w = 8, n = 3，0b00000110 is not ok;
+    //主要问题就是，不只是看这个表达式能不能塞到n位中，还要看首位（符号位）满不满足
+    //    int cover = all1 << n; // 1111100000000
+    //    return !(x&cover);
+  /*
+  * 1 <= n <= w
+  * assume w = 8, n = 3
+  * if x > 0
+  *   0b00000010 is ok, 0b00001010 is not, and 0b00000110 is not yet (thanks itardc@163.com)
+  * if x < 0
+  *   0b11111100 is ok, 0b10111100 is not, and 0b11111000 is not yet
+  * the point is
+  *   x << (w-n) >> (w-n) must be equal to x itself.
+   *   本质是 w-n 对于这个数实在是没有什么用，对于正数要求这w-n个数是0，对于负数是1
+  */
+    int w = sizeof(int) << 3;
+    int offset = w - n;
+    return (x << offset >> offset) == x;
 }
+
 
 //2.71
 typedef unsigned packed_t;
-//原先的func没有考虑到machine 是 算术右移的
+//This function can’t extract negetive number from packet_t word.
+//原先的func没有考虑到负数的情况，符号扩展的时候会将负数变为正数
 //ban 掉了 & 怎么做呢
 int xbyte(packed_t word,int bytenum){
-    int max = 0xffffffff;
-    int offset = bytenum << 3;
+    int max_bytenum = 3;
+    return (int) word << ((max_bytenum - bytenum) << 3) >> (max_bytenum << 3);
 }
+
 
 //2.72
 void copy_int(int val,void* buf,int maxbytes){
     //Wrong Code:if(maxbytes - sizeof(val) >= 0)
     // ->  For operation sizeof return 'size_t' equals to unsigned
-    if(maxbytes >= sizeof(val))
+    //if(maxbytes >= sizeof(val)) 这样还是不行，万一有人传了一个负数的maxbytes进来就完蛋了
+    if (maxbytes >= (int ) sizeof(val)) // 必须添加一个强制类型转换
         memcpy(buf,(void*)&val, sizeof(val));
 }
-
 
 
 //2.73
 //饱和（溢出）的时候返回 Tmax or Tmin
 int saturating_add(int x, int y){
+    //不使用if怎么办？太优雅了 这写法
     int sum = x + y;
-    //不使用if怎么办？
+    int sig_mask = INT_MIN;
+    /*
+     * if x > 0, y > 0 but sum < 0, it's a positive overflow
+     * if x < 0, y < 0 but sum >= 0, it's a negetive overflow
+     */
+    int pos_over = !(x & sig_mask) && !(y & sig_mask) && (sum & sig_mask);
+    int neg_over = (x & sig_mask) && (y & sig_mask) && !(sum & sig_mask);
 
+    (pos_over && (sum = INT_MAX) || neg_over && (sum = INT_MIN));
+
+    return sum;
+    //links : https://dreamanddead.github.io/CSAPP-3e-Solutions/chapter2/2.73/
 }
 
 //2.74
 //if x-y not overflows, return 1
+//只会有 1.负-非负  2.非负-负
 int tsub_ok(int x, int y){
-    //不用 < 很难做到
+    int sub = x - y;
+    int mask = all1;
+    int res = 1;
+     (x & mask) && !(y & mask) && !(sub & mask)&&(res = 0); // nmp
+     !(x & mask) && (y & mask) && (sub & mask)&&(res = 0); // pmn
+    //还有一种情况？？？我觉得Tmin已经解决问题了？？？
+    //是这样的，博客的实现有问题，单凭y==Tmin并不能判断溢出，只有x>=0&&y==Tmin才可以说溢出；
+    return res;
 }
 
 //2.75
