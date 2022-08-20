@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 
 const int w = sizeof(int) << 3;
 const int all1 = ~0; //全为1的cover_code
